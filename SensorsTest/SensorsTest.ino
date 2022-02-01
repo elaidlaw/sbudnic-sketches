@@ -6,6 +6,7 @@ void setup() {
   // create and enable the sensors interface
   sensors = new Sensors();
   sensors->enable();
+  Serial.begin(9600);
 }
 
 void loop() {

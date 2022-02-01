@@ -43,10 +43,10 @@ void setup() {
 }
 
 void loop() {
-  byte byteArr[135];
-  int state = radio.receive(byteArr, 135);
+  byte byteArr[20];
+  int state = radio.receive(byteArr, 20);
 
   if (state == RADIOLIB_ERR_NONE) {
-    Serial.write(byteArr, 135);
+    Serial.write(byteArr, 20);
   }
 }
