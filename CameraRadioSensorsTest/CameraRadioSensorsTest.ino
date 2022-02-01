@@ -32,7 +32,8 @@ void takeAndTransmitPhoto() {
     return;
   }
   uint8_t pckts[10000] = {0};
-  int numPackets = camera0->readData(pckts, 10000, photoId);
+//  int numPackets = camera0->readData(pckts, 10000, photoId);
+  int numPackets = 1;
   camera0->disable();
   delay(5000);
   radioLink->enable();
