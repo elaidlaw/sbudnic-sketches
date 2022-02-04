@@ -18,7 +18,7 @@ void loop() {
   uint32_t picLen = camera0->takePicture();
   uint8_t pckts[10000];
   memset(pckts, 0, sizeof(uint8_t) * 10000);
-  int numPackets = camera0->readData(pckts, 10000);
+  int numPackets = camera0->readData(pckts, 10000, 1);
   for (int i = 0; i < 256 * numPackets; i++) {
     Serial.write(pckts[i]);
 //    if (i % 256 == 0) {
