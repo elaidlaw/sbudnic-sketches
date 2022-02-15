@@ -3,7 +3,7 @@
 #include <SPI.h>
 #include "memorysaver.h"
 
-const int CS1 = 7;
+const int CS1 = 8;
 const int CS2 = 9;
 bool is_header = false;
 int mode = 0;
@@ -16,7 +16,6 @@ ArduCAM myCAM2(OV5642, CS2);
 
 void setup() {
   Wire.begin();
-  Wire.onRequest(requestEvent);
   Serial.begin(9600);
   Serial.println(F("ACK CMD ArduCAM Start! END"));
   // set the CS as an output:
@@ -93,7 +92,16 @@ void setup() {
 }
 
 void loop() {
-  Serial.println("starting capture 1");
+  Wire.requestFrom(44, 1);
+  byte whichCam = Wire.read();
+  
+  Serial.println("which cam");
+  Serial.println(whichCam);
+  uint8_t temp,temp_last;
+  bool done = false;
+
+  if (whichCam == 0) {
+    Serial.println("starting capture 1");
 
   myCAM1.flush_fifo(); 
   myCAM1.clear_fifo_flag();   
@@ -107,8 +115,6 @@ void loop() {
   Serial.println("burst");
   delay(2000);
   length--;
-  uint8_t temp,temp_last;
-  bool done = false;
   while (length > 0 && !done) {
     int counter = 0;
     Wire.beginTransmission(44);
@@ -140,7 +146,8 @@ void loop() {
   
   myCAM1.CS_HIGH();
   delay(10000);
-  Serial.println("starting capture 2");
+  } else {
+    Serial.println("starting capture 2");
 
   myCAM2.flush_fifo(); 
   myCAM2.clear_fifo_flag();   
@@ -191,23 +198,7 @@ void loop() {
   
   myCAM2.CS_HIGH();
   delay(10000);
-}
-
-// function that executes whenever data is requested by master
-// this function is registered as an event, see setup()
-void requestEvent() {
-  Serial.println("request");
-  if (length == 0) {
-    return;
   }
-  if (!sentLength) {
-    char out[6];
-    sprintf(out, "%06d", length);
-    Wire.write(out); // respond with message of 6 bytes
-    sentLength = true;
-  } else {
-    int counter = 0;
-    
-  }
+  
   
 }
