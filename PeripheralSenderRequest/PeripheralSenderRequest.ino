@@ -142,7 +142,7 @@ void requestEvent() {
   Wire.write(lengthStr);
   Wire.endTransmission();
   
-  done = false;
+  boolean done = false;
   while (length > 0 && !done) {
     int counter = 0;
     Wire.beginTransmission(44);
