@@ -31,8 +31,8 @@ void setup() {
   Wire.onRequest(requestEvent);
   Serial.begin(9600);  // start serial for output
   radioLink = new RFM96LoRALink();
-  radioLink->enable();
   delay(5000);
+  radioLink->enable();
   digitalWrite(6, LOW);
   lasttime = millis();
 }
@@ -40,7 +40,8 @@ void setup() {
 void loop() {
   if (received > 256 && received - transmitted > 0) {
     int num = min(received - transmitted, 128);
-    Serial.write(data + transmitted, num);
+    Serial.println("transmitting");
+    radioLink->transmit(data + transmitted, num);
     transmitted += num;
   }
   delay(50);
