@@ -20,17 +20,20 @@ int received = 0;
 int transmitted = 0;
 long lasttime = 0;
 
+byte camToUse = 1;
+
 
 void setup() {
-  pinMode(4, OUTPUT);
-  digitalWrite(4, HIGH);
+  pinMode(6, OUTPUT);
+  digitalWrite(6, HIGH);
   Wire.begin(44);        // join i2c bus (address optional for master)
   Wire.onReceive(receiveEvent);
+  Wire.onRequest(requestEvent);
   Serial.begin(9600);  // start serial for output
   radioLink = new RFM96LoRALink();
   radioLink->enable();
   delay(5000);
-  digitalWrite(4, LOW);
+  digitalWrite(6, LOW);
   lasttime = millis();
 }
 
@@ -42,7 +45,7 @@ void loop() {
   }
   delay(50);
   if (millis() - lasttime > 60000) {
-    digitalWrite(4, HIGH);
+    digitalWrite(6, HIGH);
   }
 }
 
@@ -63,4 +66,8 @@ void receiveEvent(int howMany)
   }
   memcpy(data + received, in, howMany);
   received += howMany;
+}
+
+void requestEvent() {
+  Wire.write(camToUse);
 }
