@@ -82,9 +82,11 @@ void loop() {
 
 void receiveEvent(int howMany)
 {
-  char in[howMany];
+  uint8_t in[howMany];
   for (int i = 0; i < howMany; i++) {
     in[i] = Wire.read();
+
+    
   }
   if (in[0] == 'L' && in[1] == 'S') {
     length = atoi(in + 2);
