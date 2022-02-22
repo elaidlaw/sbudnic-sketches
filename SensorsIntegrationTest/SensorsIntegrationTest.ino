@@ -34,17 +34,23 @@ void loop() {
     Serial.println("waiting");
     delay(500);
   }
-  Serial.println(num);
+//  Serial.println(num);
   recobj->disable();
-  Serial.println("picture done");
-  Serial.println(recobj->get_output_pos());
+//  Serial.println("picture done");
+//  Serial.println();
+  int d = recobj->get_output_pos();
+  int z;
+  for(z=0;z<d;z++){
+    Serial.write(data[z]);
+    delay(10);
+  }
   delay(2000);
 
   radioLink->enable();
   delay(1000);
   radioLink->disable();
   delay(1000);
-  Serial.println("radio done");
+//  Serial.println("radio done");
 
   sensors->enable();
   char sensorData[DATA_LENGTH] = {0};
@@ -53,12 +59,11 @@ void loop() {
   sensorData[DATA_LENGTH] = {0};
   sensors->readAllSensors(sensorData);
   sensors->disable();
-  Serial.println("sensors done");
-  int z;
+//  Serial.println("sensors done");
   for(z=0; z<DATA_LENGTH;z++){
-    Serial.print(sensorData[z]);
+//    Serial.print(sensorData[z]);
   }
-  Serial.println();
+//  Serial.println();
 
   delay(15000);
   
