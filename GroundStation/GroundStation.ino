@@ -35,7 +35,7 @@ SX1278 radio = new Module(10, 2, 9, 3);
 //SX1278 radio = RadioShield.ModuleA;
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(500000);
 
   // initialize SX1278 with default settings
   int state = radio.begin();
@@ -43,10 +43,11 @@ void setup() {
 }
 
 void loop() {
-  byte byteArr[128];
-  int state = radio.receive(byteArr, 128);
+  byte byteArr[256] = {};
+  int state = radio.receive(byteArr, 256);
 
   if (state == RADIOLIB_ERR_NONE) {
-    Serial.write(byteArr, 128);
+    Serial.write(byteArr, 256);
+    Serial.println();
   }
 }

@@ -11,8 +11,9 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   byte data[135] = {0};
+  sprintf((char*)data, "hello");
   radioLink->enable();  
-  radioLink->transmit(data, 135);
+  radioLink->transmit(data, 5);
   delay(1000);
   radioLink->disable();  
   delay(5000);
