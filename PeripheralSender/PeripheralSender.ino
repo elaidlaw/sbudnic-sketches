@@ -92,18 +92,57 @@ void setup() {
 }
 
 void loop() {
-  Wire.requestFrom(44, 1);
-  byte whichCam = Wire.read();
+  int SETTINGS_BYTES_SIZE = 4;
+  Wire.requestFrom(44, 11);
+  byte settings[SETTINGS_BYTES_SIZE];
+  for(int i =0;i<SETTINGS_BYTES_SIZE;i++){
+    settings[i] = Wire.read();
+  }
+
+  //Settings: useCam1, useCam2 (redundant?), safe2operate, photoResolution
+  
+  
+  
+//  byte whichCam = Wire.read();
   
   Serial.println("which cam");
   Serial.println(whichCam);
   uint8_t temp,temp_last;
   bool done = false;
 
-  if (whichCam == 0) {
+  if (settings[0]) {
     Serial.println("starting capture 1");
 
   myCAM1.flush_fifo(); 
+
+  switch(settings[3]){
+    case 0x00:
+      myCAM1.OV5642_set_JPEG_size(OV5642_320x240);delay(1000);
+      break;
+    case 0x01:
+      myCAM1.OV5642_set_JPEG_size(OV5642_640x480);delay(1000);
+      break;
+    case 0x02:
+      myCAM1.OV5642_set_JPEG_size(OV5642_1024x768);delay(1000);
+      break;
+    case 0x03:
+      myCAM1.OV5642_set_JPEG_size(OV5642_1280x960);delay(1000);
+      break;
+    case 0x04:
+      myCAM1.OV5642_set_JPEG_size(OV5642_1600x1200);delay(1000);
+      break;
+    case 0x05:
+      myCAM1.OV5642_set_JPEG_size(OV5642_2048x1536);delay(1000);
+      break;
+    case 0x06:
+      myCAM1.OV5642_set_JPEG_size(OV5642_2592x1944);delay(1000);
+      break;
+    default:
+      myCAM1.OV5642_set_JPEG_size(OV5642_640x480);delay(1000);
+      break;
+  }
+
+  
   myCAM1.clear_fifo_flag();   
   myCAM1.start_capture();
   while(!myCAM1.get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK));
@@ -149,7 +188,36 @@ void loop() {
   } else {
     Serial.println("starting capture 2");
 
+
   myCAM2.flush_fifo(); 
+
+  switch(settings[3]){
+    case 0x00:
+      myCAM2.OV5642_set_JPEG_size(OV5642_320x240);delay(1000);
+      break;
+    case 0x01:
+      myCAM2.OV5642_set_JPEG_size(OV5642_640x480);delay(1000);
+      break;
+    case 0x02:
+      myCAM2.OV5642_set_JPEG_size(OV5642_1024x768);delay(1000);
+      break;
+    case 0x03:
+      myCAM2.OV5642_set_JPEG_size(OV5642_1280x960);delay(1000);
+      break;
+    case 0x04:
+      myCAM2.OV5642_set_JPEG_size(OV5642_1600x1200);delay(1000);
+      break;
+    case 0x05:
+      myCAM2.OV5642_set_JPEG_size(OV5642_2048x1536);delay(1000);
+      break2;
+    case 0x06:
+      myCAM2.OV5642_set_JPEG_size(OV5642_2592x1944);delay(1000);
+      break;
+    default:
+      myCAM2.OV5642_set_JPEG_size(OV5642_640x480);delay(1000);
+      break;
+  }
+  
   myCAM2.clear_fifo_flag();   
   myCAM2.start_capture();
   while(!myCAM2.get_bit(ARDUCHIP_TRIG, CAP_DONE_MASK));
