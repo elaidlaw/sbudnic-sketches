@@ -41,16 +41,19 @@ void setup() {
   Serial.begin(9600);
   receiver = new Receiver(data, 50000);
   receiver->disable();
-  WDT::wddelay(5000);
+  WDT::reload();
+  radioLink = new RFM96LoRALink();
+  radioLink->disable();
+  WDT::reload();
+  sensors = new Sensors();
+  sensors->disable();
+  WDT::reload();
+  WDT::wddelay(15000);
   Wire.begin(44);
   Wire.onReceive(Receiver::receive_data);
   Wire.onRequest(Receiver::send_settings);
 
-  WDT::reload();
-  radioLink = new RFM96LoRALink();
-  WDT::reload();
-  sensors = new Sensors();
-  WDT::reload();
+  
 
   radioLink->enable();
   LinkProtocol::getRestartPacket(packet);

@@ -2,8 +2,8 @@ import serial
 from datetime import datetime
 import re
 import numpy as np
-#/dev/cu.usbserial-14530
-arduino = serial.Serial(port='/dev/cu.usbserial-14530', baudrate=500000, timeout=.1)
+
+arduino = serial.Serial(port='COM8', baudrate=500000, timeout=.1)
 
 def read_packet():
     new = arduino.readall()
