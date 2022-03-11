@@ -7,6 +7,8 @@ from rich import print
 
 arduino = serial.Serial(port='/dev/cu.usbmodem14101', baudrate=500000, timeout=.1)
 
+# Possible BUG first command probably doesnt work, so we may have to send HI first then do stuff after
+
 def read_packet():
     new = arduino.readall()
     while len(new) < 258:
