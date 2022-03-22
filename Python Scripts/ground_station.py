@@ -62,6 +62,7 @@ while True:
                     del images[image_id]
         elif packet[0][0] == 'T':
             telemetry = re.split('[|:]', packet[1].decode('utf-8'))
+            print(packet[1])
             data = ['0', telemetry[1], telemetry[2], telemetry[3], telemetry[5], telemetry[6], telemetry[7], telemetry[8], telemetry[9], telemetry[10]]
             data = [float(x) for x in data]
             data[0] = datetime.now().timestamp()

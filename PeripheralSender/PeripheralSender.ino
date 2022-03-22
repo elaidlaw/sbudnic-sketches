@@ -92,21 +92,18 @@ void setup() {
 }
 
 void loop() {
-  int SETTINGS_BYTES_SIZE = 4;
+  int SETTINGS_BYTES_SIZE = 2;
   Wire.requestFrom(44, 11);
   byte settings[SETTINGS_BYTES_SIZE];
   for(int i =0;i<SETTINGS_BYTES_SIZE;i++){
     settings[i] = Wire.read();
   }
 
-  //Settings: useCam1, useCam2 (redundant?), safe2operate, photoResolution
+  //Settings: useCam1, photoResolution
   
   
   
 //  byte whichCam = Wire.read();
-  
-  Serial.println("which cam");
-  Serial.println(whichCam);
   uint8_t temp,temp_last;
   bool done = false;
 
@@ -115,30 +112,30 @@ void loop() {
 
   myCAM1.flush_fifo(); 
 
-  switch(settings[3]){
+  switch(settings[1]){
     case 0x00:
-      myCAM1.OV5642_set_JPEG_size(OV5642_320x240);delay(1000);
+      myCAM1.OV5642_set_JPEG_size(OV5642_320x240);delay(100);
       break;
     case 0x01:
-      myCAM1.OV5642_set_JPEG_size(OV5642_640x480);delay(1000);
+      myCAM1.OV5642_set_JPEG_size(OV5642_640x480);delay(100);
       break;
     case 0x02:
-      myCAM1.OV5642_set_JPEG_size(OV5642_1024x768);delay(1000);
+      myCAM1.OV5642_set_JPEG_size(OV5642_1024x768);delay(100);
       break;
     case 0x03:
-      myCAM1.OV5642_set_JPEG_size(OV5642_1280x960);delay(1000);
+      myCAM1.OV5642_set_JPEG_size(OV5642_1280x960);delay(100);
       break;
     case 0x04:
-      myCAM1.OV5642_set_JPEG_size(OV5642_1600x1200);delay(1000);
+      myCAM1.OV5642_set_JPEG_size(OV5642_1600x1200);delay(100);
       break;
     case 0x05:
-      myCAM1.OV5642_set_JPEG_size(OV5642_2048x1536);delay(1000);
+      myCAM1.OV5642_set_JPEG_size(OV5642_2048x1536);delay(100);
       break;
     case 0x06:
-      myCAM1.OV5642_set_JPEG_size(OV5642_2592x1944);delay(1000);
+      myCAM1.OV5642_set_JPEG_size(OV5642_2592x1944);delay(100);
       break;
     default:
-      myCAM1.OV5642_set_JPEG_size(OV5642_640x480);delay(1000);
+      myCAM1.OV5642_set_JPEG_size(OV5642_320x240);delay(100);
       break;
   }
 
@@ -191,30 +188,30 @@ void loop() {
 
   myCAM2.flush_fifo(); 
 
-  switch(settings[3]){
+  switch(settings[1]){
     case 0x00:
-      myCAM2.OV5642_set_JPEG_size(OV5642_320x240);delay(1000);
+      myCAM2.OV5642_set_JPEG_size(OV5642_320x240);delay(100);
       break;
     case 0x01:
-      myCAM2.OV5642_set_JPEG_size(OV5642_640x480);delay(1000);
+      myCAM2.OV5642_set_JPEG_size(OV5642_640x480);delay(100);
       break;
     case 0x02:
-      myCAM2.OV5642_set_JPEG_size(OV5642_1024x768);delay(1000);
+      myCAM2.OV5642_set_JPEG_size(OV5642_1024x768);delay(100);
       break;
     case 0x03:
-      myCAM2.OV5642_set_JPEG_size(OV5642_1280x960);delay(1000);
+      myCAM2.OV5642_set_JPEG_size(OV5642_1280x960);delay(100);
       break;
     case 0x04:
-      myCAM2.OV5642_set_JPEG_size(OV5642_1600x1200);delay(1000);
+      myCAM2.OV5642_set_JPEG_size(OV5642_1600x1200);delay(100);
       break;
     case 0x05:
-      myCAM2.OV5642_set_JPEG_size(OV5642_2048x1536);delay(1000);
-      break2;
+      myCAM2.OV5642_set_JPEG_size(OV5642_2048x1536);delay(100);
+      break;
     case 0x06:
-      myCAM2.OV5642_set_JPEG_size(OV5642_2592x1944);delay(1000);
+      myCAM2.OV5642_set_JPEG_size(OV5642_2592x1944);delay(100);
       break;
     default:
-      myCAM2.OV5642_set_JPEG_size(OV5642_640x480);delay(1000);
+      myCAM2.OV5642_set_JPEG_size(OV5642_320x240);delay(100);
       break;
   }
   

@@ -7,11 +7,13 @@
 ReceiverInterface* receiver;
 LinkInterface* radioLink;
 SensorsInterface* sensors;
+DeploymentInterface* deployment;
 uint8_t data[50000];
 uint8_t packet[256];
 
 int photoId = 0;
 int telemetryId = 0;
+int loopCount = 0;
 
 // Low power configuration
 int main(void) {
@@ -38,23 +40,36 @@ void setup() {
   digitalWrite(PIN_ENABLE_I2C_PULLUP, HIGH);
   WDT::enable();
   WDT::reload();
+  Config::load();
+  Config::data.restartCount += 1;
+  Config::save();
+  
   Serial.begin(9600);
   receiver = new Receiver(data, 50000);
   receiver->disable();
-  WDT::reload();
-  radioLink = new RFM96LoRALink();
-  radioLink->disable();
-  WDT::reload();
-  sensors = new Sensors();
-  sensors->disable();
-  WDT::reload();
-  WDT::wddelay(15000);
+  WDT::wddelay(1000);
   Wire.begin(44);
   Wire.onReceive(Receiver::receive_data);
   Wire.onRequest(Receiver::send_settings);
 
+  WDT::reload();
+  radioLink = new RFM96LoRALink();
+  WDT::reload();
+  radioLink->disable();
+  WDT::reload();
+  sensors = new Sensors();
+  WDT::reload();
+  sensors->disable();
+  WDT::reload();
   
-
+  if (!Config::data.safeToOperate) {
+    WDT::wddelay(300000);
+    Config::data.safeToOperate = true;
+    Config::save();
+    deployment = new Deployment();
+    deployment->deploy();
+  }
+  WDT::reload();
   radioLink->enable();
   LinkProtocol::getRestartPacket(packet);
   WDT::reload();
@@ -62,17 +77,36 @@ void setup() {
   WDT::reload();
   radioLink->disable();
   WDT::reload();
-  
+  receiveAndProcessCommands();
 }
 
 void loop() {
+  long loopStart = millis();
   getAndTransmitPhoto();
   getAndTransmitTelemetry();
-  WDT::wddelay(10000);
+  receiveAndProcessCommands();
+  
+  long sleepMs = loopStart + Config::data.downlinkInterval * 1000 - millis();
+  if (sleepMs > 0) {
+    WDT::wddelay(sleepMs);
+  }
+  loopCount += 1;
+  if (loopCount > 50) {
+    LinkProtocol::tacticalRestart();
+  }
   
 }
 
 void getAndTransmitPhoto() {
+  if (!Config::data.camera1Enabled && !Config::data.camera2Enabled) {
+    return;
+  }
+  if (!Config::data.camera1Enabled && Receiver::useCam1) {
+    Receiver::useCam1 = false;
+  }
+  if (!Config::data.camera2Enabled && !Receiver::useCam1) {
+    Receiver::useCam1 = true;
+  }
   WDT::reload();
   receiver->enable();
   long photoStart = millis();
@@ -114,7 +148,6 @@ void getAndTransmitTelemetry() {
   sensors->readAllSensors(sensorData);
   WDT::reload();
   delay(1000);
-
   sensors->readAllSensors(sensorData);
   WDT::reload();
   sensors->disable();
@@ -126,4 +159,29 @@ void getAndTransmitTelemetry() {
   WDT::reload();
   radioLink->disable();
   WDT::reload();
+}
+
+void receiveAndProcessCommands() {
+  WDT::reload();
+  byte command[256] = {};
+  radioLink->enable();
+  WDT::reload();
+  LinkProtocol::getUplinkStart(packet);
+  radioLink->transmit(packet, HEADER_LENGTH);
+  WDT::reload();
+  Serial.println("starting receive");
+  long loopStart = millis();
+  long lastCommand = millis();
+  while (millis() - loopStart < Config::data.uplinkDuration * 1000 * 5 && millis() - lastCommand < Config::data.uplinkDuration * 1000) {
+    radioLink->receive(command);
+    WDT::reload();
+    if (LinkProtocol::processCommand((char*)command, radioLink) == 0) {
+      lastCommand = millis();
+      memset(command, 0, 256);
+    }
+    WDT::reload();
+  }
+  LinkProtocol::getUplinkEnd(packet);
+  radioLink->transmit(packet, HEADER_LENGTH);
+  radioLink->disable();
 }

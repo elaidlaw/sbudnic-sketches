@@ -5,7 +5,7 @@ import numpy as np
 from threading import Thread
 from rich import print
 
-arduino = serial.Serial(port='/dev/cu.usbmodem14101', baudrate=500000, timeout=.1)
+arduino = serial.Serial(port='COM12', baudrate=500000, timeout=.1)
 
 # Possible BUG first command probably doesnt work, so we may have to send HI first then do stuff after
 
@@ -18,10 +18,10 @@ def read_packet():
 def send_command():
     while(True):
         command = input()
-        possible_commands_reg = ["HI", "A9", "F7", "L5", "O3", "C1", "M8", "H2", "QK", "R6", "Z4"]
+        possible_commands_reg = ["HI", "A9", "F7", "L5", "O3", "C1", "M8", "H2", "QK", "R6", "Z4", "U0"]
         possible_commands_param = ["SG", "TW"]
 
-        if command[0:2] in possible_commands_reg or command[0:2] in possible_commands_param:
+        if command[0:2] in possible_commands_reg or command[0:2] in possible_commands_param or True:
             print("[bold yellow](PythonScript) Sent Command: " + command)
             arduino.write(bytes(command, 'utf-8'))
         else:
@@ -98,14 +98,13 @@ while True:
             commandText = packet[1].decode("utf-8")
             commandText = commandText.strip()
             print(f'[dim]Ground Station Command [{commandText}]')
-        elif packet[0][0] == "U":
-            if packet[0][0:2] == "US":
+        elif packet[0][0] == 'U':
+            if packet[0][1] == 'S':
                 print("[bold green]Uplink Start!")
-            elif packet[0][0:2] == "UE":
+            elif packet[0][1] == 'E':
                 print("[bold green]Uplink End!")
-            elif packet[0][0:2] == "UR":
-                #TODO MIGHT HAVBE TO EDIT the [4:5] part
-                print('[bold green]Restarting with Command: {packet[0][4:5]}')
+            elif packet[0][1] == "R":
+                print(f'[bold green]Command {packet[0][3:5]} received. Response: {packet[1].decode("utf-8")}')
         else:
             print(f'Couldn\'t parse packet {packet}')
     except:
