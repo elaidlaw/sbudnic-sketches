@@ -11,6 +11,12 @@ DeploymentInterface* deployment;
 uint8_t data[50000];
 uint8_t packet[256];
 
+#define TEMP_DATA_BUFFER_SIZE 1440
+float tempSensor1Data[TEMP_DATA_BUFFER_SIZE];
+float tempSensor2Data[TEMP_DATA_BUFFER_SIZE];
+long tempSensorTimes[TEMP_DATA_BUFFER_SIZE];
+int tempSensorHead = 0;
+
 int photoId = 0;
 int telemetryId = 0;
 int loopCount = 0;
@@ -63,7 +69,7 @@ void setup() {
   WDT::reload();
   
   if (!Config::data.safeToOperate) {
-    WDT::wddelay(300000);
+    WDT::wddelay(30000);
     Config::data.safeToOperate = true;
     Config::save();
     deployment = new Deployment();
@@ -138,6 +144,18 @@ void getAndTransmitPhoto() {
   WDT::reload();
 }
 
+void getTelemetry() {
+  WDT::reload();
+  sensors->enable();
+  delay(1000);
+  WDT::reload();
+  tempSensor1Data[tempSensorHead] = sensors->readTempSensor(0);
+  tempSensor2Data[tempSensorHead] = sensors->readTempSensor(1);
+  delay(1000);
+  tempSensor1Data[tempSensorHead] = sensors->readTempSensor(0);
+  tempSensor2Data[tempSensorHead] = sensors->readTempSensor(1);
+  tempSensorHead = (tempSensorHead + 1) % TEMP_DATA_BUFFER_SIZE;
+}
 
 void getAndTransmitTelemetry() {
   WDT::reload();
